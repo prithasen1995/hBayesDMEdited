@@ -9,7 +9,7 @@
 #' @templateVar MODEL_TYPE Hierarchical
 #' @templateVar DATA_COLUMNS "subjID", "level1_choice", "level2_choice", "reward"
 #' @templateVar PARAMETERS \code{a1} (learning rate in stage 1), \code{beta1} (inverse temperature in stage 1), \code{a2} (learning rate in stage 2), \code{beta2} (inverse temperature in stage 2), \code{pi} (perseverance), \code{w} (model-based weight), \code{lambda} (eligibility trace)
-#' @templateVar REGRESSORS 
+#' @templateVar REGRESSORS "mf_RPE", "mb_RPE", "mfb_RPE"
 #' @templateVar POSTPREDS "y_pred_step1", "y_pred_step2"
 #' @templateVar LENGTH_DATA_COLUMNS 4
 #' @templateVar DETAILS_DATA_1 \item{subjID}{A unique identifier for each subject in the data-set.}
@@ -46,6 +46,10 @@ ts_par7 <- hBayesDM_model(
     "w" = c(0, 0.5, 1),
     "lambda" = c(0, 0.5, 1)
   ),
-  regressors      = NULL,
+  regressors      = list(
+    "mf_RPE" = 2,
+    "mb_RPE" = 2,
+    "mfb_RPE" = 2
+  ),
   postpreds       = c("y_pred_step1", "y_pred_step2"),
   preprocess_func = ts_preprocess_func)

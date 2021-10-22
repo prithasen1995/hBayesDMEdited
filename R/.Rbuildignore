@@ -20,3 +20,5 @@
 ^codecov\.yml$
 ^cran-comments\.md$
 ^vignettes/
+^packrat/
+^\.Rprofile$

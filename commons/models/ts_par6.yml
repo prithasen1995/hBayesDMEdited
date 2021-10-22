@@ -51,6 +51,9 @@ parameters:
     desc: model-based weight
     info: [0, 0.5, 1]
 regressors:
+  mf_RPE: 2
+  mb_RPE: 2
+  mfb_RPE: 2
 postpreds:
   - y_pred_step1
   - y_pred_step2

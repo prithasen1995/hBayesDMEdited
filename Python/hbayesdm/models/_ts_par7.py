@@ -32,7 +32,9 @@ class TsPar7(TaskModel):
                 ('lambda', (0, 0.5, 1)),
             ]),
             regressors=OrderedDict([
-                
+                ('mf_RPE', 2),
+                ('mb_RPE', 2),
+                ('mfb_RPE', 2),
             ]),
             postpreds=['y_pred_step1', 'y_pred_step2'],
             parameters_desc=OrderedDict([
@@ -172,7 +174,7 @@ def ts_par7(
         String specifying how to summarize the individual parameters.
         Current options are: ``'mean'``, ``'median'``, or ``'mode'``.
     model_regressor
-        Whether to export model-based regressors. Currently not available for this model.
+        Whether to export model-based regressors. For this model they are: "mf_RPE", "mb_RPE", "mfb_RPE".
     vb
         Whether to use variational inference to approximately draw from a
         posterior distribution. Defaults to ``False``.
@@ -205,7 +207,7 @@ def ts_par7(
         - ``fit``: A PyStan StanFit object that contains the fitted Stan model.
         - ``raw_data``: Pandas DataFrame containing the raw data used to fit the model,
           as specified by the user.
-        
+        - ``model_regressor``: Dict holding the extracted model-based regressors.
 
     Examples
     --------

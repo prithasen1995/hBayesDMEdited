@@ -34,7 +34,7 @@ transformed parameters {
   vector<lower=0>[N]         beta2;
   vector<lower=0,upper=5>[N] pi;
   vector<lower=0,upper=1>[N] w;
-  vector<lower=0,upper=1>[N] lambda;
+  vector<lower=0,upper=1>[N] lambda; 
 
   for (i in 1:N) {
       a1[i]     = Phi_approx( mu_pr[1] + sigma[1] * a1_pr[i] );
@@ -44,6 +44,7 @@ transformed parameters {
       pi[i]     = Phi_approx( mu_pr[5] + sigma[5] * pi_pr[i] ) * 5;
       w[i]      = Phi_approx( mu_pr[6] + sigma[6] * w_pr[i] );
       lambda[i] = Phi_approx( mu_pr[7] + sigma[7] * lambda_pr[i] );
+	 
   }
 }
 model {
@@ -126,6 +127,11 @@ generated quantities {
   real<lower=0,upper=1> mu_w;
   real<lower=0,upper=1> mu_lambda;
 
+  //Initialising regressors
+  real mf_RPE[N, T]; 
+  real mb_RPE[N, T];
+  real mfb_RPE[N, T];	
+
   // For log likelihood calculation
   real log_lik[N];
 
@@ -136,6 +142,11 @@ generated quantities {
   // Set all posterior predictions to 0 (avoids NULL values)
   for (i in 1:N) {
     for (t in 1:T) {
+
+      mf_RPE[i, t] = 0;
+      mb_RPE[i, t] = 0;
+      mfb_RPE[i, t] = 0;
+
       y_pred_step1[i,t] = -1;
       y_pred_step2[i,t] = -1;
     }
@@ -207,6 +218,11 @@ generated quantities {
       // After observing the reward at Level 2...
       // Update Level 2 v_mf of the chosen option. Level 2--> choose one of level 2 options and observe reward
       v_mf[2+ level2_choice[i,t]] += a2[i]*(reward[i,t] - v_mf[2+ level2_choice[i,t] ] );
+
+      //Model Regressors
+      mf_RPE[i, t] = reward[i, t] - v_mf[level1_choice[i, t]];
+      mb_RPE[i, t] = reward[i, t] - v_mb[level1_choice[i, t]];
+      mfb_RPE[i, t] = (reward[i, t] - v_mf[level1_choice[i, t]]) - (reward[i, t] - v_mb[level2_choice[i, t]]);
 
       // Update Level 1 v_mf
       v_mf[level1_choice[i,t]] += lambda[i] * a1[i] * (reward[i,t] - v_mf[2+level2_choice[i,t]]);

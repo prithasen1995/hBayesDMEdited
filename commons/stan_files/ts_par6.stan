@@ -121,7 +121,12 @@ generated quantities {
   real<lower=0>         mu_beta2;
   real<lower=0,upper=5> mu_pi;
   real<lower=0,upper=1> mu_w;
-
+  
+  //For generating model regressors
+  real mf_RPE[N, T];
+  real mb_RPE[N, T];
+  real mfb_RPE[N, T];
+  
   // For log likelihood calculation
   real log_lik[N];
 
@@ -132,6 +137,11 @@ generated quantities {
   // Set all posterior predictions to 0 (avoids NULL values)
   for (i in 1:N) {
     for (t in 1:T) {
+
+      mf_RPE[i, t] = 0;
+      mb_RPE[i, t] = 0;
+      mfb_RPE[i, t] = 0;
+
       y_pred_step1[i,t] = -1;
       y_pred_step2[i,t] = -1;
     }
@@ -202,6 +212,11 @@ generated quantities {
       // After observing the reward at Level 2...
       // Update Level 2 v_mf of the chosen option. Level 2--> choose one of level 2 options and observe reward
       v_mf[2+ level2_choice[i,t]] += a2[i]*(reward[i,t] - v_mf[2+ level2_choice[i,t] ] );
+
+	  // Model regressor --> store values before being updated
+      mf_RPE[i, t] = reward[i, t] - v_mf[level1_choice[i, t]]; // regressor for model-free reward prediction error
+      mb_RPE[i, t] = reward[i, t] - v_mb[level1_choice[i, t]]; // regressor for model-based reward prediction error
+      mfb_RPE[i, t] = (reward[i, t] - v_mf[level1_choice[i, t]]) - (reward[i, t] - v_mb[level2_choice[i, t]]); // regressor for difference between model-free and model-based reward prediction error
 
       // Update Level 1 v_mf
       v_mf[level1_choice[i,t]] += a1[i] * (reward[i,t] - v_mf[2+level2_choice[i,t]]);
